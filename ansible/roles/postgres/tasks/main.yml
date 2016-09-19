@@ -1,0 +1,81 @@
+---
+# file: roles/common_os_setup/tasks/main.yml
+
+- name: ensure apt cache is up to date
+  apt: update_cache=yes
+
+- name: instalar paquetes
+  apt: name={{item}} update_cache=yes state=installed
+  with_items:
+  - postgresql
+  - postgresql-client
+  - postgresql-contrib
+
+- name: ensure apt packages are upgraded
+  apt: upgrade=yes
+
+- name: instalar paquetes python
+  apt: name={{item}} update_cache=yes state=installed
+  with_items:
+  - python-psycopg2
+  - python-pip
+
+- name: install psycopg2 python module
+  pip: name=psycopg2
+
+- name: copy pg_hba template
+  copy: src={{item}} dest="/etc/postgresql/9.3/main/pg_hba.conf"
+  with_items:
+      - pg_hba.conf
+
+- name: ensure database is created pol_v2
+  sudo_user: postgres
+  postgresql_db: name=pol_v2
+
+- name: ensure database is created maf
+  sudo_user: postgres
+  postgresql_db: name=maf
+
+- name: ensure database is created jms
+  sudo_user: postgres
+  postgresql_db: name=jms
+
+- name: ensure user has access to database pol_v2
+  sudo_user: postgres
+  postgresql_user: db=pol_v2 name=pol_v2 password=pol123456$t8911 priv=ALL
+
+- name: ensure user has access to database postgres
+  sudo_user: postgres
+  postgresql_user: name=postgres password=123456
+
+- name: ensure user has access to database maf
+  sudo_user: postgres
+  postgresql_user: db=maf name=maf password=maf123456$t8911 priv=ALL
+
+- name: Start the Postgresql service
+  sudo: yes
+  service:
+    name: postgresql
+    state: started
+    enabled: true
+
+- name: Importing  data pol_v2
+  sudo_user: postgres
+  shell: psql pol_v2 < /home/dev/db_pol/backuppolv2.sql
+
+- name: Importing  data maf
+  sudo_user: postgres
+  shell: psql maf < /home/dev/db_pol/dumpmafschema
+
+- name: Importing  data jms
+  sudo_user: postgres
+  shell: psql jms < /home/dev/db_pol/jms.sql
+
+- name: Importing  data actualizaciones
+  sudo_user: postgres
+  shell: psql pol_v2 < /home/dev/db_pol/actualizaciones_pol_v2.sql
+
+- name: configuring pg_hba
+  lineinfile: dest=/etc/postgresql/9.3/main/pg_hba.conf line="host    all      all     10.100.12.0/24      trust"
+  lineinfile: dest=/etc/postgresql/9.3/main/pg_hba.conf line="host    all      all     192.168.101.0/24    trust"
+  lineinfile: dest=/etc/postgresql/9.3/main/pg_hba.conf line="host    all      all     172.19.0.0/24     trust"

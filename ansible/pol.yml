@@ -1,0 +1,11 @@
+---
+
+#file: pol.yml
+
+- hosts: ci
+  sudo: yes
+  gather_facts: no
+  roles:
+    - common_os_setup
+    - java7
+    - postgres

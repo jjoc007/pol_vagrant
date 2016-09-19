@@ -1,0 +1,20 @@
+---
+
+maven:
+    download_url: http://ftp.cixug.es/apache/maven/maven-3/3.3.3/binaries/apache-maven-3.3.3-bin.tar.gz
+    file: apache-maven-3.3.3-bin.tar.gz
+    home: /opt/apache-maven-3.3.3
+
+
+apache:
+    server_name: dev.example
+    ssl_folder: /etc/apache2/ssl
+    certificate_file: /etc/apache2/ssl/dev.example.crt
+    certificate_key_file: /etc/apache2/ssl/dev.example.key
+    sonar_http: http://localhost:9000/sonar
+    nexus_http: http://localhost:8081/nexus
+    jenkins_http: http://localhost:8080/jenkins
+    custom_log_file: app_custom.log
+    error_log_file: app_error.log
+    custom_https_log: app_custom_https.log
+    error_https_log: app_error_https.log

@@ -1,0 +1,26 @@
+---
+
+- name: ensure apt cache is up to date
+  apt: update_cache=yes
+
+- name: Autoaccept license for Java
+  shell: echo oracle-java7-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections
+
+- name: instalar java
+  apt: name=oracle-java7-installer update_cache=yes state=latest install_recommends=yes
+  environment:
+    JAVA_HOME: /usr/lib/jvm/java-7-oracle
+
+- name: copy files security java
+  copy: src={{item}} dest="/usr/lib/jvm/java-7-oracle/jre/lib/security/"
+  with_items:
+      - blacklist
+      - cacerts
+      - java.policy
+      - java.security
+      - javafx.policy
+      - javaws.policy
+      - local_policy.jar
+      - README.txt
+      - trusted.libraries
+      - US_export_policy.jar

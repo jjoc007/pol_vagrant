@@ -1,0 +1,40 @@
+---
+# file: roles/common_os_setup/tasks/main.yml
+
+- name: adicion de repositorios
+  apt_repository: repo='ppa:webupd8team/java' state=present
+
+- name: ensure apt cache is up to date
+  apt: update_cache=yes
+
+- name: instalar paquetes
+  apt: name={{item}}
+  with_items:
+  - vim
+  - git
+
+- name: ensure apt packages are upgraded
+  apt: upgrade=yes
+
+- name: Copiar hosts
+  copy: src=/home/dev/pol/hosts dest=/etc/
+
+- name: POL permisos
+  file: path=/home/dev/git/ts_utils/.bash_aliases mode=0777
+
+- name: POL command 
+  shell: "source /home/dev/git/ts_utils/contra/util.sh"
+  shell: "source /home/dev/git/ts_utils/contra/maf.sh"
+  shell: "source /home/dev/git/ts_utils/contra/pol.sh"
+  args:
+     executable: /bin/bash
+
+- name: pol copy
+  copy: src=/home/dev/git/ts_utils/.bash_aliases dest=~/ 
+
+- name: command maven
+  copy: src=/home/dev/pol/maven-1.0.2/bin/maven dest=/usr/bin/
+
+- name: command maven permisos
+  file: path=/usr/bin/maven mode=0777
+
